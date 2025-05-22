@@ -164,34 +164,101 @@ def make_prediction(model, current_features_df):
 if __name__ == '__main__':
     print("--- Демонстрация модуля model_trainer ---")
 
+    # --- Helper functions to create dummy data if missing ---
+    def create_dummy_market_data_for_trainer(filepath, symbol, timeframe, num_rows=100):
+        print(f"Создание dummy рыночных данных для model_trainer: {filepath}")
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        timestamps = pd.date_range(start='2023-01-01 00:00:00', periods=num_rows, freq='H')
+        data = {
+            'timestamp': timestamps,
+            'open': np.random.uniform(100, 200, size=num_rows),
+            'high': np.random.uniform(200, 300, size=num_rows), # Will be adjusted
+            'low': np.random.uniform(50, 100, size=num_rows),   # Will be adjusted
+            'close': np.random.uniform(100, 200, size=num_rows),
+            'volume': np.random.uniform(1000, 5000, size=num_rows)
+        }
+        df = pd.DataFrame(data)
+        # Ensure high >= max(open, close) and low <= min(open, close)
+        df['high'] = df[['high', 'open', 'close']].max(axis=1) + np.random.uniform(0, 10, size=num_rows)
+        df['low'] = df[['low', 'open', 'close']].min(axis=1) - np.random.uniform(0, 10, size=num_rows)
+        df['low'] = np.maximum(0, df['low']) # Ensure low is not negative
+        
+        df.to_csv(filepath, index=False)
+        print(f"Dummy рыночные данные сохранены: {filepath}")
+
+    def create_dummy_news_data_for_trainer(filepath, num_rows=30, market_start_time_str='2023-01-01 00:00:00', market_periods=100, market_freq='H'):
+        print(f"Создание dummy новостных данных для model_trainer: {filepath}")
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        
+        # Generate news timestamps that overlap with market data
+        market_start_time = pd.to_datetime(market_start_time_str)
+        market_end_time = market_start_time + pd.Timedelta(hours=(market_periods -1)) # Approx end time of market data
+        
+        # Generate news timestamps within this range
+        news_timestamps = []
+        for _ in range(num_rows):
+            random_offset_hours = np.random.randint(0, market_periods -1)
+            random_offset_minutes = np.random.randint(0, 59)
+            news_time = market_start_time + pd.Timedelta(hours=random_offset_hours, minutes=random_offset_minutes)
+            news_timestamps.append(news_time)
+        news_timestamps.sort()
+
+        data = {
+            'publishedAt': [ts.strftime('%Y-%m-%d %H:%M:%S') for ts in news_timestamps], # Store as string, like real CSV
+            'title': [f"Dummy News Title {i+1}" for i in range(num_rows)],
+            'description': [f"Dummy news description for article {i+1}. Market is very interesting today." for i in range(num_rows)],
+            'url': [f'http://example.com/news_trainer_{i+1}' for i in range(num_rows)],
+            'source_name': [f'TestSource{chr(65+i%3)}' for i in range(num_rows)]
+        }
+        df = pd.DataFrame(data)
+        df.to_csv(filepath, index=False)
+        print(f"Dummy новостные данные сохранены: {filepath}")
+
     # --- 0. Параметры и подготовка путей ---
-    dummy_symbol = 'DUMMY-COIN-USDT' # Используем тот же символ, что и в data_preparer
+    dummy_symbol = 'DUMMY-COIN-USDT'
     dummy_timeframe = '1H'
+    num_market_data_rows = 100 # Достаточно для индикаторов с периодом 50
+
     model_filename = f"{dummy_symbol.lower().replace('-', '_')}_{dummy_timeframe.lower()}_rf_classifier.joblib"
     full_model_path = os.path.join(DEFAULT_MODEL_SAVE_DIR, model_filename)
 
-    # Убедимся, что dummy данные созданы (data_preparer.__main__ должен был их создать)
-    # Если нет, можно вызвать функции создания dummy данных из data_preparer.py
-    # dp_module.create_dummy_market_data(...) # и для новостей
-    
-    # --- 1. Загрузка и подготовка данных с использованием data_preparer ---
-    print("\n[Main] Шаг 1: Загрузка и обработка рыночных данных...")
+    # Пути к dummy данным
+    dummy_market_data_path = os.path.join(DEFAULT_MAIN_HIST_DIR, f"{dummy_symbol.upper()}_{dummy_timeframe.upper()}.csv")
+    dummy_news_data_path = os.path.join(DEFAULT_MAIN_NEWS_DIR, "dummy_news_aggregated_for_trainer.csv") # Unique name
+
+    # --- 1. Проверка и создание Dummy Данных при необходимости ---
+    if not os.path.exists(dummy_market_data_path):
+        print(f"Файл dummy рыночных данных не найден. Создание: {dummy_market_data_path}")
+        create_dummy_market_data_for_trainer(dummy_market_data_path, dummy_symbol.upper(), dummy_timeframe.upper(), num_rows=num_market_data_rows)
+    else:
+        print(f"Найден существующий файл dummy рыночных данных: {dummy_market_data_path}")
+        
+    if not os.path.exists(dummy_news_data_path):
+        print(f"Файл dummy новостных данных не найден. Создание: {dummy_news_data_path}")
+        create_dummy_news_data_for_trainer(dummy_news_data_path, num_rows=30, market_periods=num_market_data_rows)
+    else:
+        print(f"Найден существующий файл dummy новостных данных: {dummy_news_data_path}")
+        
+    # --- 2. Загрузка и подготовка данных с использованием data_preparer ---
+    print("\n[Main] Шаг 1 (model_trainer): Загрузка и обработка рыночных данных...")
     market_df = dp_module.load_and_prepare_market_data(
-        symbol=dummy_symbol, 
-        timeframe=dummy_timeframe,
+        symbol=dummy_symbol.upper(), # Ensure uppercase for consistency
+        timeframe=dummy_timeframe.upper(),
         hist_data_dir=DEFAULT_MAIN_HIST_DIR,
         indicators_module=ti_module
     )
 
-    print("\n[Main] Шаг 2: Загрузка и обработка новостных данных...")
+    print("\n[Main] Шаг 2 (model_trainer): Загрузка и обработка новостных данных...")
     news_df = dp_module.load_and_prepare_news_data(
-        news_csv_filename='dummy_news_aggregated.csv', # Используем dummy файл из data_preparer
-        news_data_dir=DEFAULT_MAIN_NEWS_DIR,
+        news_csv_filename=os.path.basename(dummy_news_data_path), # Используем имя файла из определенного выше пути
+        news_data_dir=DEFAULT_MAIN_NEWS_DIR, # Каталог тот же
         sentiment_module=sa_module
     )
     
     if market_df is None or market_df.empty:
         print("[Main] Ошибка: Не удалось загрузить или подготовить рыночные данные. Демонстрация прервана.")
+        # Попытка удалить потенциально "плохие" dummy файлы, чтобы они пересоздались при следующем запуске
+        if os.path.exists(dummy_market_data_path): os.remove(dummy_market_data_path)
         exit()
     
     # Если новости не загрузились, создаем пустой DataFrame, чтобы объединение не упало
