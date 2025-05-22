@@ -2,7 +2,7 @@ beautifulsoup4
 feedparser
 newspaper3k
 numpy
-okx-python-sdk-api
+okx
 pandas
 pandas-ta
 python-dotenv
