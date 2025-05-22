@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sublime-workspace
+
+# Data files
+data/*.csv
+data/*.sqlite
+data/*.db
+
+# Model files
+models/*.pkl
+models/*.joblib
+
+# Log files
+logs/*.log
+
+# Jupyter Notebook
+.ipynb_checkpoints

@@ -1,0 +1,13 @@
+beautifulsoup4
+feedparser
+newspaper3k
+numpy
+okx
+pandas
+pandas-ta
+python-dotenv
+python-telegram-bot
+requests
+scikit-learn
+statsmodels
+vaderSentiment
