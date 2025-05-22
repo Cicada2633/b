@@ -49,17 +49,17 @@
 2.  **Dummy-модель:**
     Бот использует предварительно обученную модель. Для демонстрации используется "dummy" модель.
     *   Убедитесь, что файл модели `dummy_coin_usdt_1h_rf_classifier.joblib` существует в папке `AdvancedCryptoBot/models/`.
-    *   Если его нет, вы можете сгенерировать его, запустив скрипт обучения модели:
+    *   Если его нет, вы можете сгенерировать его, запустив скрипт обучения модели (выполняется из корневой папки `AdvancedCryptoBot`):
         ```bash
-        python AdvancedCryptoBot/src/ml_model/model_trainer.py
+        python -m src.ml_model.model_trainer
         ```
         Это создаст dummy-модель на основе небольшого набора случайных данных.
 
 3.  **Лог сигналов (`signals_log.csv`):**
     Этот файл используется для логирования сгенерированных сигналов и последующего сбора обратной связи.
-    *   Для инициализации файла (создания с правильными заголовками), если он еще не существует, запустите:
+    *   Для инициализации файла (создания с правильными заголовками), если он еще не существует, запустите (выполняется из корневой папки `AdvancedCryptoBot`):
         ```bash
-        python AdvancedCryptoBot/src/feedback_system/feedback_manager.py
+        python -m src.feedback_system.feedback_manager
         ```
 
 4.  **Основные параметры в `DEFAULT_CONFIG` (в `main_controller.py`):**
@@ -72,29 +72,32 @@
 ## 4. Локальный запуск на Windows (24/7)
 
 1.  **Простой запуск:**
-    Убедитесь, что виртуальное окружение активировано.
+    Убедитесь, что виртуальное окружение активировано и вы находитесь в корневой папке `AdvancedCryptoBot`.
     ```bash
-    python AdvancedCryptoBot/src/main_controller.py
+    python -m src.main_controller
     ```
     Бот начнет работу. Вся информация (логи) будет выводиться в консоль. **Бот остановится, как только вы закроете это окно консоли.**
 
 2.  **Запуск без окна консоли (`pythonw.exe`):**
     `pythonw.exe` – это версия Python для Windows, которая запускает скрипты без открытия окна консоли.
+    Убедитесь, что вы находитесь в корневой папке `AdvancedCryptoBot`.
     ```bash
-    pythonw AdvancedCryptoBot/src/main_controller.py
+    pythonw -m src.main_controller
     ```
     *   **Важно:** При таком запуске вы не увидите ошибок или логов в консоли. Убедитесь, что логирование в файл настроено и работает корректно в `main_controller.py` (текущая версия использует `logging.basicConfig`, который выводит в консоль; для вывода в файл его нужно будет модифицировать).
 
 3.  **Пакетный файл (.bat) для автоматического перезапуска:**
-    Создайте файл `run_bot.bat` в корневой папке проекта со следующим содержимым (замените `C:\path	o\your\project` на ваш реальный путь к проекту):
+    Создайте файл `run_bot.bat` в корневой папке проекта (`AdvancedCryptoBot`) со следующим содержимым (замените `C:\path	o\your\project\AdvancedCryptoBot` на ваш реальный путь к проекту):
     ```bat
     @echo off
+    cd C:\path	o\your\project\AdvancedCryptoBot
+    
     :start
     echo Starting Crypto Bot (%date% %time%)
-    rem Активация виртуального окружения, если нужно (зависит от того, как настроен Python)
-    rem C:\path	o\your\project\AdvancedCryptoBot\.venv\Scriptsctivate.bat 
+    rem Активация виртуального окружения, если оно не активировано глобально
+    rem .venv\Scriptsctivate.bat 
     
-    python C:\path	o\your\project\AdvancedCryptoBot\src\main_controller.py
+    python -m src.main_controller
     
     echo Bot process ended (%date% %time%). Restarting in 30 seconds...
     timeout /t 30 /nobreak
@@ -109,8 +112,8 @@
     *   **Триггер:** "При запуске компьютера" или "При входе в систему".
     *   **Действие:** "Запустить программу".
         *   Программа/скрипт: `python.exe` (или `pythonw.exe`).
-        *   Добавить аргументы: `C:\path	o\your\project\AdvancedCryptoBot\src\main_controller.py`.
-        *   Рабочая папка: `C:\path	o\your\project\AdvancedCryptoBot\src\` (или корневая папка проекта).
+        *   Добавить аргументы: `-m src.main_controller`.
+        *   Рабочая папка: `C:\path	o\your\project\AdvancedCryptoBot\` (корневая папка проекта).
     *   Настройте условия (например, запускать только при наличии сетевого подключения) и параметры (например, перезапускать при сбое).
 
 ## 5. Потенциальные бесплатные хостинг-опции

@@ -154,9 +154,9 @@ Justification: _AI prediction: UP with 75.60% confidence._
 
 3.  **Шаг 3: Переобучение модели.**
     *   Когда вы накопите достаточное количество записей с обратной связью (например, 50-100 или больше), вы можете запустить скрипт переобучения.
-    *   Откройте командную строку, активируйте виртуальное окружение и выполните:
+    *   Откройте командную строку из корневой папки `AdvancedCryptoBot`, активируйте виртуальное окружение и выполните:
         ```bash
-        python AdvancedCryptoBot/src/retraining/retrainer.py
+        python -m src.retraining.retrainer
         ```
     *   Этот скрипт:
         *   Загрузит данные из `signals_log.csv`.
@@ -179,9 +179,9 @@ Justification: _AI prediction: UP with 75.60% confidence._
 
 Бэктестинг позволяет протестировать, как ваша модель и торговая логика работали бы на исторических данных.
 
-*   **Запуск бэктестера:**
+*   **Запуск бэктестера (из корневой папки `AdvancedCryptoBot`):**
     ```bash
-    python AdvancedCryptoBot/src/backtesting/simple_backtester.py
+    python -m src.backtesting.simple_backtester
     ```
 *   Скрипт использует конфигурацию из `BACKTEST_CONFIG` внутри себя (по умолчанию для `DUMMY_COIN-USDT`) и загружает соответствующую модель. Он симулирует сделки на исторических данных и выводит статистику.
 *   **Интерпретация метрик (примеры):**

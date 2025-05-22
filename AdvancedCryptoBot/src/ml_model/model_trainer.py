@@ -6,28 +6,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import numpy as np # For NaN handling and dummy data generation
 
-# --- Attempt to import project-specific modules ---
-try:
-    from AdvancedCryptoBot.src.ml_data_preparation import data_preparer as dp_module
-    from AdvancedCryptoBot.src.feature_engineering import technical_indicators as ti_module
-    from AdvancedCryptoBot.src.feature_engineering import sentiment_analysis as sa_module
-    # For dummy data creation, if needed directly (though data_preparer should handle it)
-    # from AdvancedCryptoBot.src.ml_data_preparation.data_preparer import create_dummy_market_data, create_dummy_news_data
-
-except ImportError:
-    print("Attempting fallback imports for model_trainer.py...")
-    import sys
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
-    src_path = os.path.join(project_root, 'src')
-
-    if src_path not in sys.path:
-        sys.path.insert(0, src_path)
-        
-    from ml_data_preparation import data_preparer as dp_module
-    from feature_engineering import technical_indicators as ti_module
-    from feature_engineering import sentiment_analysis as sa_module
-    # from ml_data_preparation.data_preparer import create_dummy_market_data, create_dummy_news_data
+# --- Project Module Imports (Relative) ---
+from ..ml_data_preparation import data_preparer as dp_module
+from ..feature_engineering import technical_indicators as ti_module
+from ..feature_engineering import sentiment_analysis as sa_module
+# For dummy data creation, if needed directly (though data_preparer should handle it)
+# from ..ml_data_preparation.data_preparer import create_dummy_market_data, create_dummy_news_data
 
 
 # --- Base directory definitions (relative to this file) ---

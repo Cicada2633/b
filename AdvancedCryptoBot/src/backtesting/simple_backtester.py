@@ -3,34 +3,15 @@ import numpy as np
 import os
 from datetime import datetime # For dummy data
 
-# --- Project Module Imports ---
-try:
-    from AdvancedCryptoBot.src.data_collection import market_data_api as market_api # Not directly used in backtester, but good for context
-    from AdvancedCryptoBot.src.data_collection import news_api as news_api_module
-    from AdvancedCryptoBot.src.data_collection import data_caching as data_caching # For loading data
-    from AdvancedCryptoBot.src.feature_engineering import technical_indicators as ti_module
-    from AdvancedCryptoBot.src.feature_engineering import sentiment_analysis as sa_module
-    from AdvancedCryptoBot.src.ml_data_preparation import data_preparer as dp_module
-    from AdvancedCryptoBot.src.ml_model import model_trainer as mt_module # For loading model
-    from AdvancedCryptoBot.src.trading_logic import signal_generator as sg_module
-except ImportError:
-    print("Attempting fallback imports for simple_backtester.py...")
-    import sys
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
-    src_path = os.path.join(project_root, 'src')
-
-    if src_path not in sys.path:
-        sys.path.insert(0, src_path)
-    
-    # from data_collection import market_data_api as market_api
-    from data_collection import news_api as news_api_module
-    from data_collection import data_caching as data_caching
-    from feature_engineering import technical_indicators as ti_module
-    from feature_engineering import sentiment_analysis as sa_module
-    from ml_data_preparation import data_preparer as dp_module
-    from ml_model import model_trainer as mt_module
-    from trading_logic import signal_generator as sg_module
+# --- Project Module Imports (Relative) ---
+# from ..data_collection import market_data_api as market_api # Not directly used in backtester, but good for context
+from ..data_collection import news_api as news_api_module
+from ..data_collection import data_caching as data_caching # For loading data
+from ..feature_engineering import technical_indicators as ti_module
+from ..feature_engineering import sentiment_analysis as sa_module
+from ..ml_data_preparation import data_preparer as dp_module
+from ..ml_model import model_trainer as mt_module # For loading model
+from ..trading_logic import signal_generator as sg_module
 
 
 # --- Base directory definitions (for __main__) ---

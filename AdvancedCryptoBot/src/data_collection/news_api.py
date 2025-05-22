@@ -7,23 +7,17 @@ import feedparser # Для RSS
 import time # для time.mktime при конвертации struct_time
 
 # Импорт функций кэширования из соседнего модуля
-# Предполагается, что data_caching.py находится в той же директории
+from .data_caching import (
+    generate_cache_key,
+    save_to_cache,
+    load_from_cache,
+    is_cache_valid
+)
+# Попытка импорта BeautifulSoup для очистки HTML, если он доступен
 try:
-    from .data_caching import (
-        generate_cache_key,
-        save_to_cache,
-        load_from_cache,
-        is_cache_valid
-    )
+    from bs4 import BeautifulSoup
 except ImportError:
-    # Если запускается как скрипт, а не как часть пакета
-    print("Не удалось выполнить относительный импорт data_caching. Попытка прямого импорта...")
-    from data_caching import (
-        generate_cache_key,
-        save_to_cache,
-        load_from_cache,
-        is_cache_valid
-    )
+    BeautifulSoup = None # Заглушка, если BeautifulSoup недоступен
 
 
 # Определяем базовые пути относительно этого файла для сохранения CSV
@@ -403,12 +397,12 @@ def fetch_news_from_rss(feed_url, source_name):
             
             # Простой способ убрать HTML из описания, если нужно (не идеально, но для начала)
             if description:
-                try:
-                    from bs4 import BeautifulSoup
-                    soup = BeautifulSoup(description, "html.parser")
-                    description = soup.get_text()
-                except Exception: # Если BeautifulSoup не установлен или ошибка
-                    pass 
+                if BeautifulSoup: # Используем BeautifulSoup только если он был успешно импортирован
+                    try:
+                        soup = BeautifulSoup(description, "html.parser")
+                        description = soup.get_text()
+                    except Exception: # Если ошибка при парсинге BeautifulSoup
+                        pass # Оставляем description как есть
                 description = description[:500] # Ограничим длину описания
 
             extracted_articles.append({

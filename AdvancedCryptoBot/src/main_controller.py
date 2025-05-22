@@ -4,50 +4,19 @@ import logging
 import os
 import pandas as pd
 import numpy as np # For NaN and feature selection
-
-# --- Project Module Imports ---
-# Using try-except for robustness, especially if run from different contexts
-try:
-    from AdvancedCryptoBot.src.data_collection import market_data_api as market_api
-    from AdvancedCryptoBot.src.data_collection import news_api as news_api_module
-    # data_caching is used indirectly by market_api and news_api_module
-    from AdvancedCryptoBot.src.feature_engineering import technical_indicators as ti_module
-    from AdvancedCryptoBot.src.feature_engineering import sentiment_analysis as sa_module
-    from AdvancedCryptoBot.src.ml_data_preparation import data_preparer as dp_module
-    from AdvancedCryptoBot.src.ml_model import model_trainer as mt_module
-    from AdvancedCryptoBot.src.trading_logic import signal_generator as sg_module
-    from AdvancedCryptoBot.src.telegram_bot import bot as tg_bot_module
-    from AdvancedCryptoBot.src.feedback_system import feedback_manager as fm_module # Feedback system
 import uuid # For unique signal IDs
 from datetime import datetime # For timestamp_generated
 
-except ImportError as e:
-    print(f"ImportError during initial project imports: {e}. Attempting fallback relative imports...")
-    # This block allows running the script directly from src/ or a similar context
-    # where the AdvancedCryptoBot package is not directly in PYTHONPATH.
-    # It adjusts sys.path to include the 'src' directory's parent if needed.
-    current_script_path = os.path.dirname(os.path.abspath(__file__))
-    project_root_path = os.path.abspath(os.path.join(current_script_path, '..', '..')) 
-    # (assuming main_controller.py is in src/) -> project_root should be AdvancedCryptoBot
-    
-    # If src/ is not the project_root, adjust:
-    # project_root_path = os.path.abspath(os.path.join(current_script_path, '..')) # If main_controller is in src/
-    
-    if project_root_path not in os.sys.path:
-         os.sys.path.insert(0, project_root_path)
-
-    # Re-attempt imports (now assuming AdvancedCryptoBot is in sys.path)
-    from src.data_collection import market_data_api as market_api
-    from src.data_collection import news_api as news_api_module
-    from src.feature_engineering import technical_indicators as ti_module
-    from src.feature_engineering import sentiment_analysis as sa_module
-    from src.ml_data_preparation import data_preparer as dp_module
-    from src.ml_model import model_trainer as mt_module
-    from src.trading_logic import signal_generator as sg_module
-    from src.telegram_bot import bot as tg_bot_module
-    from src.feedback_system import feedback_manager as fm_module # Feedback system
-import uuid # For unique signal IDs
-from datetime import datetime # For timestamp_generated
+# --- Project Module Imports (Relative) ---
+from .data_collection import market_data_api as market_api
+from .data_collection import news_api as news_api_module
+from .feature_engineering import technical_indicators as ti_module
+from .feature_engineering import sentiment_analysis as sa_module
+from .ml_data_preparation import data_preparer as dp_module
+from .ml_model import model_trainer as mt_module
+from .trading_logic import signal_generator as sg_module
+from .telegram_bot import bot as tg_bot_module
+from .feedback_system import feedback_manager as fm_module
 
 # --- Configuration ---
 DEFAULT_CONFIG = {

@@ -3,35 +3,10 @@ import numpy as np
 import os
 from datetime import datetime # For dummy data
 
-# --- Attempt to import project-specific modules ---
-# This structure assumes that the script is run from a context where
-# AdvancedCryptoBot is in the Python path (e.g., by setting PYTHONPATH)
-# or that an IDE manages the project structure.
-
-try:
-    from AdvancedCryptoBot.src.data_collection.data_caching import load_historical_data_from_csv
-    from AdvancedCryptoBot.src.feature_engineering import technical_indicators as ti_module
-    from AdvancedCryptoBot.src.feature_engineering import sentiment_analysis as sa_module
-except ImportError:
-    # Fallback for direct execution or if PYTHONPATH is not set
-    # This requires data_caching.py, technical_indicators.py, sentiment_analysis.py
-    # to be discoverable, e.g., in the same directory or via sys.path manipulation.
-    print("Attempting fallback imports for data_preparer.py...")
-    import sys
-    # Assuming the script is in AdvancedCryptoBot/src/ml_data_preparation/
-    # We need to go up two levels to AdvancedCryptoBot/
-    # then down to src/data_collection and src/feature_engineering
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(current_dir, '..', '..')) 
-    src_path = os.path.join(project_root, 'src')
-
-    if src_path not in sys.path:
-        sys.path.insert(0, src_path)
-        
-    # Now try importing with the modified path
-    from data_collection.data_caching import load_historical_data_from_csv
-    from feature_engineering import technical_indicators as ti_module
-    from feature_engineering import sentiment_analysis as sa_module
+# --- Project Module Imports (Relative) ---
+from ..data_collection.data_caching import load_historical_data_from_csv
+from ..feature_engineering import technical_indicators as ti_module
+from ..feature_engineering import sentiment_analysis as sa_module
 
 
 # --- Base directory definitions (relative to this file) ---
